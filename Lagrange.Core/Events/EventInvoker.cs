@@ -11,8 +11,8 @@ public sealed class EventInvoker(BotContext context) : IDisposable
 {
     private const string Tag = nameof(EventInvoker);
 
-    private static readonly ConcurrentDictionary<Delegate, Delegate> SyncHandlerCache = new();
-    private static readonly ConcurrentDictionary<Delegate, Delegate> AsyncHandlerCache = new();
+    private readonly ConcurrentDictionary<Delegate, Delegate> SyncHandlerCache = new();
+    private readonly ConcurrentDictionary<Delegate, Delegate> AsyncHandlerCache = new();
 
     private readonly ConcurrentDictionary<Type, Delegate?> _syncHandlers = new();
     private readonly ConcurrentDictionary<Type, Delegate?> _asyncHandlers = new();
@@ -85,6 +85,8 @@ public sealed class EventInvoker(BotContext context) : IDisposable
     {
         _syncHandlers.Clear();
         _asyncHandlers.Clear();
+        SyncHandlerCache.Clear();
+        AsyncHandlerCache.Clear();
     }
 
     private static void AddHandler(ConcurrentDictionary<Type, Delegate?> dict, Type key, Delegate handler)
@@ -103,7 +105,7 @@ public sealed class EventInvoker(BotContext context) : IDisposable
     }
 
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "DynamicMethod is not supported in AOT, but this branch is skipped there")]
-    private static Delegate BuildSyncDelegate<TEvent>(LagrangeEventHandler<TEvent> h) where TEvent : EventBase
+    private Delegate BuildSyncDelegate<TEvent>(LagrangeEventHandler<TEvent> h) where TEvent : EventBase
     {
         return SyncHandlerCache.GetOrAdd(h, handler =>
         {
@@ -127,7 +129,7 @@ public sealed class EventInvoker(BotContext context) : IDisposable
     }
 
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "DynamicMethod is not supported in AOT, but this branch is skipped there")]
-    private static Delegate BuildAsyncDelegate<TEvent>(LagrangeAsyncEventHandler<TEvent> h) where TEvent : EventBase
+    private Delegate BuildAsyncDelegate<TEvent>(LagrangeAsyncEventHandler<TEvent> h) where TEvent : EventBase
     {
         return AsyncHandlerCache.GetOrAdd(h, handler =>
         {
