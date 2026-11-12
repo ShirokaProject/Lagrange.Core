@@ -70,7 +70,7 @@ internal class WtExchangeLogic : ILogic, IDisposable
         }
     }
 
-    public async Task<bool> Login(long uin, string? password, CancellationToken token)
+    public async Task<bool> Login(long uin, string? password, CancellationToken token, bool sessionOnly = false)
     {
         _token = token;
 
@@ -94,7 +94,7 @@ internal class WtExchangeLogic : ILogic, IDisposable
             if (await Online()) return true;
         }
 
-        return await ManualLogin(uin, password);
+        return !sessionOnly && await ManualLogin(uin, password);
     }
 
     public async Task<bool> Logout()

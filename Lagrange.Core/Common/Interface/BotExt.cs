@@ -11,6 +11,10 @@ public static class BotExt
     public static Task<bool> Login(this BotContext context, CancellationToken token = default) =>
         context.EventContext.GetLogic<WtExchangeLogic>().Login(0, null, token);
 
+    /// <summary>Restore saved session tickets without falling back to password or QR login.</summary>
+    public static Task<bool> LoginWithSession(this BotContext context, CancellationToken token = default) =>
+        context.EventContext.GetLogic<WtExchangeLogic>().Login(0, null, token, sessionOnly: true);
+
     public static Task<bool> Logout(this BotContext context) =>
         context.EventContext.GetLogic<WtExchangeLogic>().Logout();
     
